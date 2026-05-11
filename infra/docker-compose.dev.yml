@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: norm_task_tracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - ntt_db_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    env_file: ../backend/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/norm_task_tracker?schema=public
+    ports:
+      - "4000:4000"
+    volumes:
+      - ntt_uploads_dev:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    env_file: ../frontend/.env
+    environment:
+      API_BASE_URL: http://backend:4000/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  ntt_db_data_dev:
+  ntt_uploads_dev:

@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16-alpine
+    env_file: .env.db
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - ntt_db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: ${BACKEND_IMAGE:-norm-task-tracker/backend:latest}
+    env_file: .env.backend
+    ports:
+      - "127.0.0.1:4000:4000"
+    volumes:
+      - ntt_uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-norm-task-tracker/frontend:latest}
+    env_file: .env.frontend
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  ntt_db_data:
+  ntt_uploads:
