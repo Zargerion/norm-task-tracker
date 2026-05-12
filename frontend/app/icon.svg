@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2C2416"/>
+      <stop offset="100%" stop-color="#1A150D"/>
+    </linearGradient>
+    <linearGradient id="letter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DEB887"/>
+      <stop offset="50%" stop-color="#C8A96E"/>
+      <stop offset="100%" stop-color="#5BAD8A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Фон с закруглёнными углами -->
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+
+  <!-- Тонкая золотая рамка -->
+  <rect x="2" y="2" width="60" height="60" rx="12" fill="none" stroke="#C8A96E" stroke-width="1" stroke-opacity="0.5"/>
+
+  <!-- Буква N -->
+  <path d="M14 14 L14 50 L22 50 L22 27 L42 50 L50 50 L50 14 L42 14 L42 37 L22 14 Z"
+        fill="url(#letter)"/>
+</svg>
