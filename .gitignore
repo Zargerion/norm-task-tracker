@@ -9,3 +9,4 @@ uploads/
 .DS_Store
 accounts.txt
 scripts/pull-prod-db.sh
+.env.scripts

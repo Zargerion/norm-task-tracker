@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import Link from 'next/link';
+import { LogoTooltip } from '@/components/ui/LogoTooltip';
 import { api } from '@/lib/api';
 import { GENSHIN_COLORS } from '@/lib/colors';
 
@@ -57,7 +57,7 @@ export default function RegisterPage() {
         {step === 'form' ? (
           <>
             <div className="flex flex-col items-center mb-8 gap-2">
-              <Image src="/logo.png" alt="Norm Task Tracker" width={180} height={56} className="object-contain" priority />
+              <LogoTooltip size="lg" />
               <p className="text-muted text-sm">Создайте аккаунт и подтвердите его через Telegram</p>
             </div>
 

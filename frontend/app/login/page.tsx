@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import Link from 'next/link';
+import { LogoTooltip } from '@/components/ui/LogoTooltip';
 import { api } from '@/lib/api';
 
 export default function LoginPage() {
@@ -43,7 +43,7 @@ export default function LoginPage() {
         className="w-full max-w-md mx-4"
       >
         <div className="flex flex-col items-center mb-8 gap-3">
-          <Image src="/logo.png" alt="Norm Task Tracker" width={220} height={68} className="object-contain" priority />
+          <LogoTooltip size="lg" />
           <p className="text-muted text-sm">Войдите в свой аккаунт</p>
         </div>
 
