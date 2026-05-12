@@ -13,6 +13,7 @@
         - "{{ app_dir }}"
         - "{{ app_dir }}/data/db"
         - "{{ app_dir }}/data/uploads"
+      become: yes
 
     - name: Check .env files exist on server
       stat:
