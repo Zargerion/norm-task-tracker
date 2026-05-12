@@ -10,11 +10,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-  app.use(bodyParser.json({ limit: '20mb' }));
-  app.use(bodyParser.urlencoded({ extended: true, limit: '20mb' }));
+  const bodyLimit = process.env.BODY_PARSER_LIMIT ?? '20mb';
+  app.use(bodyParser.json({ limit: bodyLimit }));
+  app.use(bodyParser.urlencoded({ extended: true, limit: bodyLimit }));
   app.use(cookieParser());
 
-  const allowedOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:3000,http://localhost:3001')
+  const allowedOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:3000,http://localhost:3100')
     .split(',').map((o) => o.trim());
 
   app.enableCors({

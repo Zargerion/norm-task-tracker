@@ -1,0 +1,5 @@
+# Inventory is built dynamically in CI from GitLab Variables:
+# DEPLOY_HOST, DEPLOY_USER, DEPLOY_PORT
+#
+# For local runs use:
+# ansible-playbook main.yaml -i "prod ansible_host=<host> ansible_user=<user> ansible_port=<port>,"

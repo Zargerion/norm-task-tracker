@@ -24,6 +24,8 @@ services:
     env_file: ../backend/.env
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/norm_task_tracker?schema=public
+      CORS_ORIGIN: http://localhost:3000,http://localhost:3100
+      FRONTEND_URL: http://localhost:3100
     ports:
       - "4000:4000"
     volumes:
@@ -40,7 +42,7 @@ services:
     environment:
       API_BASE_URL: http://backend:4000/api
     ports:
-      - "3000:3000"
+      - "3100:3000"
     depends_on:
       - backend
 

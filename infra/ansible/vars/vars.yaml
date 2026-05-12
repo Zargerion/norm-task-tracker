@@ -1,0 +1,5 @@
+---
+# app_dir — passed via --extra-vars from CI (DEPLOY_APP_DIR GitLab variable)
+# domain — passed via --extra-vars from CI (DOMAIN GitLab variable)
+# docker_registry — passed via --extra-vars from CI (DOCKER_REGISTRY GitLab variable)
+# certbot_email — passed via --extra-vars from CI (CERTBOT_EMAIL GitLab variable)

@@ -8,6 +8,8 @@ RUN yarn install --frozen-lockfile
 
 FROM deps AS build
 COPY . .
+ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:4000/api
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 RUN yarn build
 
 FROM base AS runner

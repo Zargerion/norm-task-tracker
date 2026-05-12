@@ -6,7 +6,7 @@
 norm-task-tracker/
 ├── backend/          NestJS API (port 4000)
 ├── bot/              Telegram-бот (grammy, port —)
-├── frontend/         Next.js (port 3000)
+├── frontend/         Next.js (порт 3000 в процессе; в Docker на хосте 3100)
 ├── infra/            Docker Compose, Ansible
 ├── scripts/          Bash-скрипты
 ├── docs/             Документация

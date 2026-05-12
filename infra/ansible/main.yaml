@@ -1,0 +1,133 @@
+---
+- name: Deploy norm-task-tracker
+  hosts: norm_task_tracker
+  gather_facts: yes
+  vars_files:
+    - vars/vars.yaml
+
+  tasks:
+    - name: Create app directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ app_dir }}"
+        - "{{ app_dir }}/data/db"
+        - "{{ app_dir }}/data/uploads"
+
+    - name: Check .env files exist on server
+      stat:
+        path: "{{ app_dir }}/{{ item }}"
+      register: env_checks
+      loop:
+        - .env.db
+        - .env.backend
+        - .env.frontend
+
+    - name: Fail if any .env file is missing
+      fail:
+        msg: |
+          ОШИБКА: Файл {{ item.item }} не найден в {{ app_dir }}/
+          Создайте файл на сервере вручную перед первым деплоем.
+          Пример содержимого смотри в .env.example файлах в репозитории.
+      when: not item.stat.exists
+      loop: "{{ env_checks.results }}"
+
+    - name: Generate docker-compose.yml from template
+      template:
+        src: templates/docker-compose.j2
+        dest: "{{ app_dir }}/docker-compose.yml"
+        mode: '0644'
+
+    - name: Remove old docker-compose.yaml to avoid conflicts
+      file:
+        path: "{{ app_dir }}/docker-compose.yaml"
+        state: absent
+
+    - name: Check if codex-key.json exists for Docker registry auth
+      stat:
+        path: ~/codex-key.json
+      register: codex_key_file
+
+    - name: Login to Yandex Container Registry
+      shell: |
+        cat ~/codex-key.json | docker login --username json_key --password-stdin cr.yandex
+      register: docker_login_result
+      changed_when: false
+      failed_when: docker_login_result.rc != 0
+      when: codex_key_file.stat.exists
+
+    - name: Pull latest images
+      shell: docker-compose pull
+      args:
+        chdir: "{{ app_dir }}"
+      register: pull_result
+      failed_when: pull_result.rc != 0
+
+    - name: Stop old containers
+      shell: docker-compose down
+      args:
+        chdir: "{{ app_dir }}"
+      ignore_errors: yes
+
+    - name: Start services
+      shell: docker-compose up -d --remove-orphans
+      args:
+        chdir: "{{ app_dir }}"
+      register: up_result
+      failed_when: up_result.rc != 0
+
+    - name: Deploy nginx config
+      template:
+        src: templates/nginx.conf.j2
+        dest: /etc/nginx/sites-available/norm-task-tracker
+        mode: '0644'
+      become: yes
+
+    - name: Enable nginx site
+      file:
+        src: /etc/nginx/sites-available/norm-task-tracker
+        dest: /etc/nginx/sites-enabled/norm-task-tracker
+        state: link
+      become: yes
+
+    - name: Check if SSL certificate already exists
+      stat:
+        path: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+      register: ssl_cert
+      become: yes
+
+    - name: Obtain SSL certificate with certbot (first deploy only)
+      shell: |
+        certbot --nginx -d {{ domain }} --non-interactive --agree-tos -m {{ certbot_email }} --redirect
+      become: yes
+      when: not ssl_cert.stat.exists
+      register: certbot_result
+
+    - name: Test nginx config
+      shell: nginx -t
+      become: yes
+      changed_when: false
+
+    - name: Reload nginx
+      service:
+        name: nginx
+        state: reloaded
+      become: yes
+
+    - name: Verify containers are running
+      shell: >
+        docker ps
+        --filter "name=norm-task-tracker"
+        --format "{{ '{{' }}.Names{{ '}}' }}: {{ '{{' }}.Status{{ '}}' }}"
+      register: containers_status
+      changed_when: false
+
+    - name: Display containers status
+      debug:
+        msg: "Статус контейнеров:\n{{ containers_status.stdout }}"
+
+    - name: Display application URL
+      debug:
+        msg: "Приложение доступно по адресу: https://{{ domain }}"

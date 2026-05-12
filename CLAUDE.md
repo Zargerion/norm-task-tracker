@@ -25,7 +25,7 @@
 ### Структура проекта
 - `backend/` — NestJS API (порт 4000)
 - `bot/` — Telegram-бот (grammy)
-- `frontend/` — Next.js (порт 3000)
+- `frontend/` — Next.js (в контейнере 3000; на хосте в Compose проброшен **3100**, чтобы не конфликтовать с чужим :3000)
 - `infra/` — Docker Compose, Ansible
 - `scripts/` — bash-скрипты для dev/deploy
 

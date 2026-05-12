@@ -8,4 +8,4 @@
 
 ## Быстрый старт
 
-Подробности в [docs/INDEX.md](docs/INDEX.md) и [docs/DEPLOY.md](docs/DEPLOY.md). Локально: `backend` на порту 4000, `frontend` на 3000, переменные окружения по примерам `.env.example` в сервисах.
+Подробности в [docs/INDEX.md](docs/INDEX.md) и [docs/DEPLOY.md](docs/DEPLOY.md). Локально (`yarn dev`): backend — 4000, frontend — 3000. Docker Compose (`infra/docker-compose.yml` / `docker-compose.dev.yml`): фронт снаружи на **3100** (внутри контейнера по-прежнему 3000), backend — 4000. Переменные — по `.env.example` в сервисах.

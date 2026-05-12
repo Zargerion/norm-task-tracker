@@ -1,0 +1,85 @@
+image: docker:25
+
+variables:
+  DOCKER_BUILDKIT: '1'
+  # All config loaded from DEPLOY_ENV (File variable in GitLab CI/CD Variables)
+  # Separate secrets: SSH_KEY (RSA private key), CODEX_REGISTRY_OAUTH (Yandex key JSON)
+
+stages:
+  - build
+  - deploy
+
+.prod: &production_configuration
+  environment: production
+  tags:
+    - vvdev
+  only:
+    - main
+
+# Reusable env-loading step (YAML anchor)
+.env_setup: &env_setup
+  - . $DEPLOY_ENV
+  - export BACKEND_IMAGE_TAG="$DOCKER_REGISTRY/norm-task-tracker-backend:latest"
+  - export FRONTEND_IMAGE_TAG="$DOCKER_REGISTRY/norm-task-tracker-frontend:latest"
+
+# TEMPLATES
+
+.build:
+  stage: build
+  tags:
+    - vvdev
+  before_script:
+    - *env_setup
+    - cat $CODEX_REGISTRY_OAUTH | docker login --username json_key --password-stdin cr.yandex
+
+.deploy:
+  stage: deploy
+  image: cytopia/ansible:latest-tools
+  tags:
+    - vvdev
+  variables:
+    PLAYBOOK: ./infra/ansible/main.yaml
+  before_script:
+    - *env_setup
+  script:
+    - |
+      if [ -z "$SSH_KEY" ]; then
+        echo "ERROR: SSH_KEY переменная пустая!"
+        exit 1
+      fi
+    - SSH_KEY_PATH=$(pwd)/deploy_rsa
+    - printf '%s\n' "$SSH_KEY" > "$SSH_KEY_PATH"
+    - chmod 400 "$SSH_KEY_PATH"
+    - echo "Fingerprint ключа:"
+    - ssh-keygen -lf "$SSH_KEY_PATH" || echo "Не удалось получить fingerprint"
+    - echo "Тест SSH подключения:"
+    - ssh -i "$SSH_KEY_PATH" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $DEPLOY_PORT $DEPLOY_USER@$DEPLOY_HOST "echo 'SSH connection test successful'" || echo "SSH test failed, but continuing..."
+    - ansible-playbook $PLAYBOOK -i "prod ansible_host=$DEPLOY_HOST ansible_user=$DEPLOY_USER ansible_port=$DEPLOY_PORT," --private-key "$SSH_KEY_PATH"
+        --extra-vars "backend_image_tag=$BACKEND_IMAGE_TAG frontend_image_tag=$FRONTEND_IMAGE_TAG docker_registry=$DOCKER_REGISTRY domain=$DOMAIN app_dir=$DEPLOY_APP_DIR certbot_email=$CERTBOT_EMAIL"
+        --ssh-common-args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+
+# JOBS
+
+build:backend:
+  extends: .build
+  <<: *production_configuration
+  script:
+    - docker build --no-cache -t $BACKEND_IMAGE_TAG -f backend/Dockerfile backend/
+    - docker push $BACKEND_IMAGE_TAG
+
+build:frontend:
+  extends: .build
+  <<: *production_configuration
+  script:
+    - docker build --no-cache
+        --build-arg NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+        -t $FRONTEND_IMAGE_TAG
+        -f frontend/Dockerfile frontend/
+    - docker push $FRONTEND_IMAGE_TAG
+
+deploy:prod:
+  extends: .deploy
+  <<: *production_configuration
+  needs:
+    - build:backend
+    - build:frontend

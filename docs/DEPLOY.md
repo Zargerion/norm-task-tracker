@@ -76,7 +76,7 @@ NEXT_PUBLIC_API_BASE_URL=https://your-domain.com/api
 | db | postgres:16-alpine | 5432 |
 | backend | norm-task-tracker/backend | 4000 |
 | bot | norm-task-tracker/bot | — |
-| frontend | norm-task-tracker/frontend | 3000 |
+| frontend | norm-task-tracker/frontend | 3000 внутри контейнера; на хосте `127.0.0.1:3100→3000` |
 
 ## Bash скрипты
 
@@ -96,8 +96,10 @@ NEXT_PUBLIC_API_BASE_URL=https://your-domain.com/api
 
 ## Nginx (proxy)
 
+На ВМ nginx ходит на локальный проброс Docker (`127.0.0.1`), см. `infra/ansible/templates/nginx.conf.j2` — фронт: **3100**. Если nginx в той же Docker-сети, что и сервисы, можно `proxy_pass http://frontend:3000`.
+
 ```nginx
-# Frontend
+# Frontend (пример: nginx в сети compose)
 location / {
     proxy_pass http://frontend:3000;
 }
