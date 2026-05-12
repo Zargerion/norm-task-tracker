@@ -1,9 +1,7 @@
 ---
 - name: Deploy norm-task-tracker
-  hosts: norm_task_tracker
+  hosts: all
   gather_facts: yes
-  vars_files:
-    - vars/vars.yaml
 
   tasks:
     - name: Create app directories
