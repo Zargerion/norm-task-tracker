@@ -16,11 +16,12 @@ interface Props {
   project: any;
   role: string;
   spaceId: string;
+  onView: (project: any) => void;
   onEdit: (project: any) => void;
   onDelete: (id: string) => void;
 }
 
-export function ProjectCard({ project, role, spaceId, onEdit, onDelete }: Props) {
+export function ProjectCard({ project, role, spaceId, onView, onEdit, onDelete }: Props) {
   const [hovered, setHovered] = useState(false);
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
@@ -84,9 +85,10 @@ export function ProjectCard({ project, role, spaceId, onEdit, onDelete }: Props)
   return (
     <div
       ref={cardRef}
-      className="relative cursor-default"
+      className="relative cursor-pointer"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => onView(project)}
     >
     <div className="genshin-card overflow-hidden group">
       {/* Color strip */}
@@ -119,13 +121,19 @@ export function ProjectCard({ project, role, spaceId, onEdit, onDelete }: Props)
 
           {canManage && (
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button onClick={() => onEdit(project)}
-                className="p-1.5 rounded-lg hover:bg-black/5 transition-colors text-muted hover:text-secondary">
+              <button
+                onClick={(e) => { e.stopPropagation(); onEdit(project); }}
+                className="p-1.5 rounded-lg hover:bg-black/5 transition-colors text-muted hover:text-secondary"
+                title="Редактировать"
+              >
                 <Edit2 size={14} />
               </button>
               {canDelete && (
-                <button onClick={handleDelete}
-                  className="p-1.5 rounded-lg hover:bg-red-50 transition-colors text-muted hover:text-red-500">
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleDelete(); }}
+                  className="p-1.5 rounded-lg hover:bg-red-50 transition-colors text-muted hover:text-red-500"
+                  title="Удалить"
+                >
                   <Trash2 size={14} />
                 </button>
               )}

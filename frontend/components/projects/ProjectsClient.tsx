@@ -6,6 +6,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { api } from '@/lib/api';
 import { ProjectCard } from './ProjectCard';
 import { ProjectModal } from './ProjectModal';
+import { ProjectDetailModal } from './ProjectDetailModal';
 
 interface Props {
   user: any;
@@ -17,6 +18,8 @@ export function ProjectsClient({ user }: Props) {
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailProject, setDetailProject] = useState<any>(null);
 
   const role = currentRole() ?? 'EMPLOYEE';
   const canCreate = ['SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(role);
@@ -118,6 +121,7 @@ export function ProjectsClient({ user }: Props) {
                   project={project}
                   role={role}
                   spaceId={currentSpaceId}
+                  onView={(p) => { setDetailProject(p); setDetailOpen(true); }}
                   onEdit={(p) => { setEditing(p); setModalOpen(true); }}
                   onDelete={onDelete}
                 />
@@ -126,6 +130,22 @@ export function ProjectsClient({ user }: Props) {
           </AnimatePresence>
         </div>
       )}
+
+      <AnimatePresence>
+        {detailOpen && detailProject && (
+          <ProjectDetailModal
+            project={detailProject}
+            role={role}
+            onClose={() => { setDetailOpen(false); setDetailProject(null); }}
+            onEdit={() => {
+              setDetailOpen(false);
+              setEditing(detailProject);
+              setDetailProject(null);
+              setModalOpen(true);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {modalOpen && (

@@ -6,6 +6,7 @@ import { getColor } from '@/lib/colors';
 import { api } from '@/lib/api';
 import { TaskCard } from './TaskCard';
 import { TaskModal } from './TaskModal';
+import { TaskDetailModal } from './TaskDetailModal';
 import { useTaskSocket } from '@/hooks/useTaskSocket';
 
 const COLUMNS = [
@@ -27,6 +28,8 @@ export function TrackersClient({ spaceId, initialProjects, user }: Props) {
   const [tasks, setTasks] = useState<any[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailTask, setDetailTask] = useState<any>(null);
   const [projectSelectOpen, setProjectSelectOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -72,6 +75,16 @@ export function TrackersClient({ spaceId, initialProjects, user }: Props) {
     removeTask(id);
     setModalOpen(false);
     setSelectedTask(null);
+  }
+
+  function openDetail(task: any) {
+    setDetailTask(task);
+    setDetailOpen(true);
+  }
+
+  function openEdit(task: any) {
+    setSelectedTask(task);
+    setModalOpen(true);
   }
 
   const projColor = getColor(selectedProject?.color);
@@ -196,7 +209,8 @@ export function TrackersClient({ spaceId, initialProjects, user }: Props) {
                             role={role}
                             spaceId={spaceId}
                             projectId={selectedProject.id}
-                            onClick={() => { setSelectedTask(task); setModalOpen(true); }}
+                            onClick={() => openDetail(task)}
+                            onEdit={() => openEdit(task)}
                             onStatusChange={(updated) => onTaskSaved(updated)}
                           />
                         </motion.div>
@@ -218,6 +232,25 @@ export function TrackersClient({ spaceId, initialProjects, user }: Props) {
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {detailOpen && detailTask && selectedProject && (
+          <TaskDetailModal
+            task={detailTask}
+            spaceId={spaceId}
+            projectId={selectedProject.id}
+            user={user}
+            role={role}
+            onClose={() => { setDetailOpen(false); setDetailTask(null); }}
+            onEdit={() => {
+              setDetailOpen(false);
+              setSelectedTask(detailTask);
+              setDetailTask(null);
+              setModalOpen(true);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {modalOpen && selectedProject && (

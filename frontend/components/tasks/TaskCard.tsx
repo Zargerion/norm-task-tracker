@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, MessageSquare } from 'lucide-react';
+import { Clock, MessageSquare, Edit2 } from 'lucide-react';
 import { getTaskComplexity, getColor } from '@/lib/colors';
 import { api } from '@/lib/api';
 
@@ -24,10 +24,11 @@ interface Props {
   spaceId: string;
   projectId: string;
   onClick: () => void;
+  onEdit: () => void;
   onStatusChange: (task: any) => void;
 }
 
-export function TaskCard({ task, role, spaceId, projectId, onClick, onStatusChange }: Props) {
+export function TaskCard({ task, role, spaceId, projectId, onClick, onEdit, onStatusChange }: Props) {
   const [hovered, setHovered] = useState(false);
   const complexity = getTaskComplexity(task.estimatedHours);
   const tier = complexityTier(task.estimatedHours);
@@ -231,7 +232,7 @@ export function TaskCard({ task, role, spaceId, projectId, onClick, onStatusChan
             )}
           </div>
 
-          {/* Status action buttons */}
+          {/* Action buttons on hover */}
           <AnimatePresence>
             {hovered && (
               <motion.div
@@ -239,9 +240,18 @@ export function TaskCard({ task, role, spaceId, projectId, onClick, onStatusChan
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 6 }}
                 transition={{ duration: 0.15 }}
-                className="flex gap-1 flex-shrink-0"
+                className="flex gap-1 flex-shrink-0 items-center"
                 onClick={(e) => e.stopPropagation()}
               >
+                {canManage && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                    className="p-1 rounded-md hover:bg-black/5 transition-colors"
+                    title="Редактировать"
+                  >
+                    <Edit2 size={12} style={{ color: complexity.hex }} />
+                  </button>
+                )}
                 {statusIdx > 1 && canManage && (
                   <button
                     onClick={retreat}
