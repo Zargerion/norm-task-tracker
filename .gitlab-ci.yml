@@ -54,7 +54,10 @@ stages:
     - ssh-keygen -lf "$SSH_KEY_PATH" || echo "Не удалось получить fingerprint"
     - echo "Тест SSH подключения:"
     - ssh -i "$SSH_KEY_PATH" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $DEPLOY_PORT $DEPLOY_USER@$DEPLOY_HOST "echo 'SSH connection test successful'" || echo "SSH test failed, but continuing..."
-    - ansible-playbook $PLAYBOOK -i "prod ansible_host=$DEPLOY_HOST ansible_user=$DEPLOY_USER ansible_port=$DEPLOY_PORT," --private-key "$SSH_KEY_PATH"
+    - |
+      printf '[all]\nprod ansible_host=%s ansible_user=%s ansible_port=%s\n' \
+        "$DEPLOY_HOST" "$DEPLOY_USER" "$DEPLOY_PORT" > /tmp/inventory
+    - ansible-playbook $PLAYBOOK -i /tmp/inventory --private-key "$SSH_KEY_PATH"
         --extra-vars "backend_image_tag=$BACKEND_IMAGE_TAG frontend_image_tag=$FRONTEND_IMAGE_TAG docker_registry=$DOCKER_REGISTRY domain=$DOMAIN app_dir=$DEPLOY_APP_DIR certbot_email=$CERTBOT_EMAIL"
         --ssh-common-args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
