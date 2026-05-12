@@ -67,14 +67,14 @@ build:backend:
   extends: .build
   <<: *production_configuration
   script:
-    - docker build --no-cache -t $BACKEND_IMAGE_TAG -f backend/Dockerfile backend/
+    - docker build -t $BACKEND_IMAGE_TAG -f backend/Dockerfile backend/
     - docker push $BACKEND_IMAGE_TAG
 
 build:frontend:
   extends: .build
   <<: *production_configuration
   script:
-    - docker build --no-cache
+    - docker build
         --build-arg NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
         -t $FRONTEND_IMAGE_TAG
         -f frontend/Dockerfile frontend/
