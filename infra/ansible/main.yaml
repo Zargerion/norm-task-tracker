@@ -76,6 +76,12 @@
       register: up_result
       failed_when: up_result.rc != 0
 
+    - name: Check if SSL certificate already exists
+      stat:
+        path: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+      register: ssl_cert
+      become: yes
+
     - name: Deploy nginx config
       template:
         src: templates/nginx.conf.j2
@@ -90,19 +96,6 @@
         state: link
       become: yes
 
-    - name: Check if SSL certificate already exists
-      stat:
-        path: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
-      register: ssl_cert
-      become: yes
-
-    - name: Obtain SSL certificate with certbot (first deploy only)
-      shell: |
-        certbot --nginx -d {{ domain }} --non-interactive --agree-tos -m {{ certbot_email }} --redirect
-      become: yes
-      when: not ssl_cert.stat.exists
-      register: certbot_result
-
     - name: Test nginx config
       shell: nginx -t
       become: yes
@@ -113,6 +106,13 @@
         name: nginx
         state: reloaded
       become: yes
+
+    - name: Obtain SSL certificate with certbot (first deploy only)
+      shell: |
+        certbot --nginx -d {{ domain }} --non-interactive --agree-tos -m {{ certbot_email }} --redirect
+      become: yes
+      when: not ssl_cert.stat.exists
+      register: certbot_result
 
     - name: Verify containers are running
       shell: >
