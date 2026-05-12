@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateProjectDto, AddProjectMemberDto } from './dto/project.dto';
+import { CreateProjectDto, AddProjectMemberDto, UpdateProjectMemberDto } from './dto/project.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -11,7 +11,11 @@ export class ProjectsService {
       where: { spaceId },
       include: {
         milestones: { orderBy: { date: 'asc' } },
-        members: { include: { user: { select: { id: true, firstName: true, lastName: true, favoriteColor: true } } } },
+        members: {
+          include: {
+            user: { select: { id: true, firstName: true, lastName: true, favoriteColor: true, jobTitle: true } },
+          },
+        },
         _count: { select: { tasks: true } },
       },
       orderBy: { createdAt: 'desc' },
@@ -23,7 +27,11 @@ export class ProjectsService {
       where: { id, spaceId },
       include: {
         milestones: { orderBy: { date: 'asc' } },
-        members: { include: { user: true } },
+        members: {
+          include: {
+            user: { select: { id: true, firstName: true, lastName: true, favoriteColor: true, jobTitle: true } },
+          },
+        },
       },
     });
     if (!project) throw new NotFoundException('Проект не найден');
@@ -74,8 +82,22 @@ export class ProjectsService {
     const project = await this.findOne(spaceId, projectId);
     return this.prisma.projectMember.upsert({
       where: { projectId_userId: { projectId: project.id, userId: dto.userId } },
-      create: { projectId: project.id, userId: dto.userId },
-      update: {},
+      create: {
+        projectId: project.id,
+        userId: dto.userId,
+        notificationsEnabled: dto.notificationsEnabled ?? true,
+      },
+      update: {
+        notificationsEnabled: dto.notificationsEnabled ?? true,
+      },
+    });
+  }
+
+  async updateMember(spaceId: string, projectId: string, userId: string, dto: UpdateProjectMemberDto) {
+    await this.findOne(spaceId, projectId);
+    return this.prisma.projectMember.update({
+      where: { projectId_userId: { projectId, userId } },
+      data: { notificationsEnabled: dto.notificationsEnabled },
     });
   }
 

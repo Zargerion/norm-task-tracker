@@ -112,10 +112,11 @@ createdAt   DateTime
 
 ### ProjectMember
 ```
-id        uuid PK
-projectId uuid FK Project
-userId    uuid FK User
-createdAt DateTime
+id                   uuid    PK
+projectId            uuid    FK Project
+userId               uuid    FK User
+notificationsEnabled boolean DEFAULT true
+createdAt            DateTime
 UNIQUE(projectId, userId)
 ```
 
@@ -239,6 +240,7 @@ createdAt  DateTime
 - `PATCH  /api/spaces/:spaceId/projects/:id`
 - `DELETE /api/spaces/:spaceId/projects/:id`
 - `POST   /api/spaces/:spaceId/projects/:id/members`
+- `PATCH  /api/spaces/:spaceId/projects/:id/members/:userId` — обновить notificationsEnabled
 - `DELETE /api/spaces/:spaceId/projects/:id/members/:userId`
 
 ### Tasks

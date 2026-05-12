@@ -131,10 +131,11 @@ model Milestone {
 }
 
 model ProjectMember {
-  id        String   @id @default(uuid())
-  projectId String
-  userId    String
-  createdAt DateTime @default(now())
+  id                   String   @id @default(uuid())
+  projectId            String
+  userId               String
+  notificationsEnabled Boolean  @default(true)
+  createdAt            DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)

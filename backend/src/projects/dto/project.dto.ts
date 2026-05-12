@@ -1,4 +1,4 @@
-import { IsArray, IsDateString, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class MilestoneDto {
@@ -39,4 +39,13 @@ export class CreateProjectDto {
 export class AddProjectMemberDto {
   @IsUUID()
   userId: string;
+
+  @IsOptional()
+  @IsBoolean()
+  notificationsEnabled?: boolean;
+}
+
+export class UpdateProjectMemberDto {
+  @IsBoolean()
+  notificationsEnabled: boolean;
 }

@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { CreateProjectDto, AddProjectMemberDto } from './dto/project.dto';
+import { CreateProjectDto, AddProjectMemberDto, UpdateProjectMemberDto } from './dto/project.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -45,8 +45,19 @@ export class ProjectsController {
     return this.projects.addMember(spaceId, id, dto);
   }
 
+  @Patch(':id/members/:userId')
+  @Roles(SpaceRole.MANAGER)
+  updateMember(
+    @Param('spaceId') spaceId: string,
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+    @Body() dto: UpdateProjectMemberDto,
+  ) {
+    return this.projects.updateMember(spaceId, id, userId, dto);
+  }
+
   @Delete(':id/members/:userId')
-  @Roles(SpaceRole.ADMIN)
+  @Roles(SpaceRole.MANAGER)
   removeMember(@Param('spaceId') spaceId: string, @Param('id') id: string, @Param('userId') userId: string) {
     return this.projects.removeMember(spaceId, id, userId);
   }

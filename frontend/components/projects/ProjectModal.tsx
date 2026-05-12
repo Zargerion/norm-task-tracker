@@ -1,9 +1,29 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X, Plus, Trash2, Bell, BellOff, UserPlus } from 'lucide-react';
 import { GENSHIN_COLORS } from '@/lib/colors';
 import { api } from '@/lib/api';
+
+interface SpaceUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  jobTitle?: string;
+  favoriteColor?: string;
+}
+
+interface SpaceUserRecord {
+  id: string;
+  userId: string;
+  role: string;
+  user: SpaceUser;
+}
+
+interface MemberState {
+  userId: string;
+  notificationsEnabled: boolean;
+}
 
 interface Props {
   project: any | null;
@@ -25,9 +45,22 @@ export function ProjectModal({ project, spaceId, onClose, onSaved }: Props) {
       date: m.date.split('T')[0],
     })) ?? []
   );
+  const [members, setMembers] = useState<MemberState[]>(
+    project?.members?.map((m: any) => ({
+      userId: m.userId,
+      notificationsEnabled: m.notificationsEnabled ?? true,
+    })) ?? []
+  );
+  const [spaceUsers, setSpaceUsers] = useState<SpaceUser[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    api.get<SpaceUserRecord[]>(`/spaces/${spaceId}/users`)
+      .then((records) => setSpaceUsers(records.map((r) => r.user)))
+      .catch(() => {});
+  }, [spaceId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -43,15 +76,50 @@ export function ProjectModal({ project, spaceId, onClose, onSaved }: Props) {
       }
 
       const payload = { ...form, color: form.color || undefined, imageUrl, milestones };
-      const result = project
+      const saved = project
         ? await api.patch(`/spaces/${spaceId}/projects/${project.id}`, payload)
         : await api.post(`/spaces/${spaceId}/projects`, payload);
-      onSaved(result);
+
+      await syncMembers(saved.id);
+
+      const updated = await api.get(`/spaces/${spaceId}/projects/${saved.id}`);
+      onSaved(updated);
     } catch (err: any) {
       setError(err.message ?? 'Ошибка сохранения');
     } finally {
       setLoading(false);
     }
+  }
+
+  async function syncMembers(projectId: string) {
+    const existing: MemberState[] = project?.members?.map((m: any) => ({
+      userId: m.userId,
+      notificationsEnabled: m.notificationsEnabled ?? true,
+    })) ?? [];
+
+    const toRemove = existing.filter((e) => !members.find((m) => m.userId === e.userId));
+    const toAdd = members.filter((m) => !existing.find((e) => e.userId === m.userId));
+    const toUpdate = members.filter((m) => {
+      const ex = existing.find((e) => e.userId === m.userId);
+      return ex && ex.notificationsEnabled !== m.notificationsEnabled;
+    });
+
+    await Promise.all([
+      ...toRemove.map((m) =>
+        api.delete(`/spaces/${spaceId}/projects/${projectId}/members/${m.userId}`)
+      ),
+      ...toAdd.map((m) =>
+        api.post(`/spaces/${spaceId}/projects/${projectId}/members`, {
+          userId: m.userId,
+          notificationsEnabled: m.notificationsEnabled,
+        })
+      ),
+      ...toUpdate.map((m) =>
+        api.patch(`/spaces/${spaceId}/projects/${projectId}/members/${m.userId}`, {
+          notificationsEnabled: m.notificationsEnabled,
+        })
+      ),
+    ]);
   }
 
   function addMilestone() {
@@ -66,6 +134,31 @@ export function ProjectModal({ project, spaceId, onClose, onSaved }: Props) {
     const next = [...milestones];
     next[i] = { ...next[i], [field]: val };
     setMilestones(next);
+  }
+
+  function addMember(userId: string) {
+    if (members.find((m) => m.userId === userId)) return;
+    setMembers([...members, { userId, notificationsEnabled: true }]);
+  }
+
+  function removeMember(userId: string) {
+    setMembers(members.filter((m) => m.userId !== userId));
+  }
+
+  function toggleNotifications(userId: string) {
+    setMembers(members.map((m) =>
+      m.userId === userId ? { ...m, notificationsEnabled: !m.notificationsEnabled } : m
+    ));
+  }
+
+  const availableToAdd = spaceUsers.filter((u) => !members.find((m) => m.userId === u.id));
+
+  function getUserInitials(u: SpaceUser) {
+    return `${u.firstName[0]}${u.lastName[0]}`.toUpperCase();
+  }
+
+  function getMemberUser(userId: string) {
+    return spaceUsers.find((u) => u.id === userId);
   }
 
   return (
@@ -121,6 +214,86 @@ export function ProjectModal({ project, spaceId, onClose, onSaved }: Props) {
             </div>
           </div>
 
+          {/* Участники */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-medium text-secondary">Участники проекта</label>
+              <span className="text-xs text-muted">{members.length} чел.</span>
+            </div>
+
+            {members.length > 0 && (
+              <div className="space-y-2 mb-3">
+                {members.map((m) => {
+                  const u = getMemberUser(m.userId);
+                  if (!u) return null;
+                  const color = GENSHIN_COLORS.find((c) => c.key === u.favoriteColor);
+                  return (
+                    <div key={m.userId} className="flex items-center gap-3 px-3 py-2 rounded-xl bg-base border border-soft">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
+                        style={{ backgroundColor: color?.hex ?? '#9DADA8' }}>
+                        {getUserInitials(u)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-primary truncate">{u.firstName} {u.lastName}</div>
+                        {u.jobTitle && <div className="text-xs text-muted truncate">{u.jobTitle}</div>}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => toggleNotifications(m.userId)}
+                        title={m.notificationsEnabled ? 'Уведомления включены' : 'Уведомления выключены'}
+                        className="p-1.5 rounded-lg transition-colors hover:bg-black/5 flex-shrink-0"
+                      >
+                        {m.notificationsEnabled
+                          ? <Bell size={14} style={{ color: '#C8A96E' }} />
+                          : <BellOff size={14} className="text-muted" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeMember(m.userId)}
+                        className="p-1.5 rounded-lg hover:bg-red-50 text-muted hover:text-red-500 transition-colors flex-shrink-0"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {availableToAdd.length > 0 && (
+              <div className="rounded-xl border border-soft bg-base overflow-hidden">
+                <div className="px-3 py-2 border-b border-soft flex items-center gap-1.5 text-xs text-muted">
+                  <UserPlus size={12} />
+                  <span>Добавить участника</span>
+                </div>
+                <div className="max-h-40 overflow-y-auto divide-y divide-soft">
+                  {availableToAdd.map((u) => {
+                    const color = GENSHIN_COLORS.find((c) => c.key === u.favoriteColor);
+                    return (
+                      <button
+                        key={u.id}
+                        type="button"
+                        onClick={() => addMember(u.id)}
+                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-black/5 transition-colors text-left"
+                      >
+                        <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
+                          style={{ backgroundColor: color?.hex ?? '#9DADA8' }}>
+                          {getUserInitials(u)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-primary truncate">{u.firstName} {u.lastName}</div>
+                          {u.jobTitle && <div className="text-xs text-muted truncate">{u.jobTitle}</div>}
+                        </div>
+                        <Plus size={14} className="text-muted flex-shrink-0" />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Вехи */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs font-medium text-secondary">Вехи (Timeline)</label>
