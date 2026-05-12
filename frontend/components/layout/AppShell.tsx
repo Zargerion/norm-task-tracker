@@ -104,9 +104,7 @@ export function AppShell({ user, children }: Props) {
         className={`fixed lg:static inset-y-0 left-0 z-30 w-60 flex flex-col bg-sidebar border-r border-card shadow-card transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
         <div className="h-14 flex items-center px-4 border-b border-card">
-          <span className="text-lg font-semibold text-primary" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            Norm Tracker
-          </span>
+          <Image src="/logo.png" alt="Norm Task Tracker" width={120} height={36} className="object-contain" priority />
           <button className="ml-auto lg:hidden" onClick={() => setSidebarOpen(false)}>
             <X size={18} className="text-muted" />
           </button>
@@ -218,9 +216,7 @@ export function AppShell({ user, children }: Props) {
           <button onClick={() => setSidebarOpen(true)} className="mr-3">
             <Menu size={20} className="text-secondary" />
           </button>
-          <span className="text-base font-semibold text-primary" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            Norm Tracker
-          </span>
+          <Image src="/logo.png" alt="Norm Task Tracker" width={100} height={30} className="object-contain" priority />
         </header>
 
         <main className="flex-1 overflow-y-auto">

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 
@@ -41,10 +42,8 @@ export default function LoginPage() {
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="w-full max-w-md mx-4"
       >
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-semibold text-primary mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            Norm Task Tracker
-          </h1>
+        <div className="flex flex-col items-center mb-8 gap-3">
+          <Image src="/logo.png" alt="Norm Task Tracker" width={220} height={68} className="object-contain" priority />
           <p className="text-muted text-sm">Войдите в свой аккаунт</p>
         </div>
 

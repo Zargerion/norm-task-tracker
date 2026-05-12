@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { GENSHIN_COLORS } from '@/lib/colors';
@@ -55,11 +56,9 @@ export default function RegisterPage() {
       >
         {step === 'form' ? (
           <>
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-semibold text-primary" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-                Регистрация
-              </h1>
-              <p className="text-muted text-sm mt-1">Создайте аккаунт и подтвердите его через Telegram</p>
+            <div className="flex flex-col items-center mb-8 gap-2">
+              <Image src="/logo.png" alt="Norm Task Tracker" width={180} height={56} className="object-contain" priority />
+              <p className="text-muted text-sm">Создайте аккаунт и подтвердите его через Telegram</p>
             </div>
 
             <div className="genshin-card p-8">
