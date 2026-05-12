@@ -146,21 +146,50 @@ export function TrackersClient({ spaceId, initialProjects, user }: Props) {
               return (
                 <div key={col.status} className="flex flex-col w-72 flex-shrink-0">
                   {/* Column header */}
-                  <div className="flex items-center gap-2 mb-3 px-1">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: col.color }} />
-                    <span className="text-sm font-semibold text-secondary">{col.label}</span>
-                    <span className="ml-auto text-xs text-muted bg-black/5 px-2 py-0.5 rounded-full">{colTasks.length}</span>
+                  <div
+                    className="flex items-center gap-2 mb-3 px-3 py-2.5 rounded-xl"
+                    style={{
+                      background: `linear-gradient(135deg, ${col.color}14 0%, ${col.color}08 100%)`,
+                      border: `1px solid ${col.color}30`,
+                    }}
+                  >
+                    <div
+                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                      style={{
+                        backgroundColor: col.color,
+                        boxShadow: `0 0 6px ${col.color}80`,
+                      }}
+                    />
+                    <span className="text-sm font-semibold" style={{ color: col.color }}>
+                      {col.label}
+                    </span>
+                    <motion.span
+                      key={colTasks.length}
+                      initial={{ scale: 1.4, opacity: 0.6 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.25 }}
+                      className="ml-auto text-xs font-semibold px-2 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor: `${col.color}20`,
+                        color: col.color,
+                        border: `1px solid ${col.color}35`,
+                      }}
+                    >
+                      {colTasks.length}
+                    </motion.span>
                   </div>
 
                   {/* Cards */}
-                  <div className="flex-1 space-y-3 overflow-y-auto pb-4">
+                  <div className="flex-1 space-y-3 overflow-y-auto pb-4 px-0.5">
                     <AnimatePresence>
                       {colTasks.map((task) => (
-                        <motion.div key={task.id}
+                        <motion.div
+                          key={task.id}
                           layout
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.95 }}
+                          initial={{ opacity: 0, y: 12, scale: 0.97 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.93, y: -6 }}
+                          transition={{ duration: 0.22 }}
                         >
                           <TaskCard
                             task={task}
@@ -173,6 +202,15 @@ export function TrackersClient({ spaceId, initialProjects, user }: Props) {
                         </motion.div>
                       ))}
                     </AnimatePresence>
+                    {colTasks.length === 0 && (
+                      <div
+                        className="flex flex-col items-center justify-center py-10 rounded-xl border-2 border-dashed"
+                        style={{ borderColor: `${col.color}25`, color: `${col.color}60` }}
+                      >
+                        <div className="text-2xl mb-1 opacity-50">○</div>
+                        <span className="text-xs font-medium">Нет задач</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               );

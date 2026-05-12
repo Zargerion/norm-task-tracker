@@ -54,11 +54,29 @@
     border: 1px solid var(--border-card);
     border-radius: 14px;
     box-shadow: var(--shadow-card);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition: box-shadow 0.22s ease, transform 0.22s ease, border-color 0.22s ease;
   }
   .genshin-card:hover {
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover), 0 0 0 1px rgba(200,169,110,0.25);
+    transform: translateY(-2px);
+    border-color: rgba(200,169,110,0.5);
+  }
+
+  /* Kanban column */
+  .kanban-column {
+    border-radius: 14px;
+    border: 1px solid var(--border-soft);
+    background: linear-gradient(180deg, rgba(253,250,244,0.7) 0%, rgba(245,240,232,0.4) 100%);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Gold shimmer on highlighted elements */
+  @keyframes goldPulse {
+    0%, 100% { opacity: 0.6; }
+    50%       { opacity: 1; }
+  }
+  .gold-pulse {
+    animation: goldPulse 2s ease-in-out infinite;
   }
 
   .relic-shimmer {
@@ -68,21 +86,66 @@
   .relic-shimmer::after {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    inset: 0;
     background: linear-gradient(
-      60deg,
-      transparent 30%,
-      rgba(194,24,91,0.15) 50%,
-      transparent 70%
+      105deg,
+      transparent 20%,
+      rgba(194,24,91,0.12) 38%,
+      rgba(176,143,232,0.14) 50%,
+      rgba(200,119,59,0.12) 62%,
+      transparent 80%
     );
-    animation: shimmer 3s ease-in-out infinite;
+    animation: relicShimmer 4s ease-in-out infinite;
+    pointer-events: none;
   }
-  @keyframes shimmer {
-    0% { transform: translateX(-100%) rotate(20deg); }
-    100% { transform: translateX(100%) rotate(20deg); }
+  @keyframes relicShimmer {
+    0%   { transform: translateX(-80%); opacity: 0; }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { transform: translateX(80%);  opacity: 0; }
+  }
+
+  /* Epic task shimmer (purple) */
+  .epic-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .epic-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 25%,
+      rgba(149,111,212,0.1) 45%,
+      rgba(176,143,232,0.15) 55%,
+      transparent 75%
+    );
+    animation: epicShimmer 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes epicShimmer {
+    0%   { transform: translateX(-80%); opacity: 0; }
+    20%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateX(80%);  opacity: 0; }
+  }
+
+  /* Pulsing glow for task borders */
+  .task-glow-relic {
+    animation: pulseGlowRelic 2.5s ease-in-out infinite;
+  }
+  @keyframes pulseGlowRelic {
+    0%, 100% { box-shadow: 0 0 8px rgba(194,24,91,0.25), var(--shadow-card); }
+    50%       { box-shadow: 0 0 20px rgba(194,24,91,0.45), 0 0 40px rgba(194,24,91,0.15); }
+  }
+
+  .task-glow-epic {
+    animation: pulseGlowEpic 3s ease-in-out infinite;
+  }
+  @keyframes pulseGlowEpic {
+    0%, 100% { box-shadow: 0 0 6px rgba(149,111,212,0.2), var(--shadow-card); }
+    50%       { box-shadow: 0 0 16px rgba(149,111,212,0.4), 0 0 32px rgba(149,111,212,0.12); }
   }
 
   .fade-in-up {
