@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getColor } from '@/lib/colors';
 import { api } from '@/lib/api';
 import { UserProfileModal } from './UserProfileModal';
+import { useTheme } from '@/hooks/useTheme';
 
 interface Props {
   spaceId: string;
@@ -102,16 +103,43 @@ export function UsersClient({ spaceId, initialMembers, currentUser, role }: Prop
 
 function UserCard({ member, canManage, isSelf, onRoleChange, onRemove, onOpenProfile }: any) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const { dark } = useTheme();
   const color = getColor(member.user?.favoriteColor);
+  const hex = color?.hex ?? '#C8A96E';
   const u = member.user;
 
   return (
     <motion.div
       layout
       whileHover={{ scale: 1.02 }}
-      className="genshin-card p-4 w-52 cursor-pointer relative"
+      className="genshin-card p-4 w-52 cursor-pointer relative overflow-hidden"
+      style={dark ? {
+        borderColor: hovered ? `${hex}55` : `${hex}28`,
+        boxShadow: hovered
+          ? `0 0 0 1px ${hex}45, 0 8px 32px ${hex}25, 0 2px 8px rgba(0,0,0,0.5)`
+          : `0 0 0 1px ${hex}20, 0 4px 20px ${hex}12, 0 2px 8px rgba(0,0,0,0.4)`,
+        transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
+      } : undefined}
       onClick={onOpenProfile}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
+      {/* Ambient glow inside card in dark mode */}
+      {dark && (
+        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+          <div style={{
+            position: 'absolute',
+            top: '-20px', left: '50%',
+            transform: 'translateX(-50%)',
+            width: '140px', height: '140px',
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${hex}18 0%, transparent 70%)`,
+            transition: 'opacity 0.3s ease',
+            opacity: hovered ? 1 : 0.6,
+          }} />
+        </div>
+      )}
       {/* Management menu button */}
       {canManage && !isSelf && (
         <div className="absolute top-2 right-2" onClick={(e) => e.stopPropagation()}>
@@ -150,9 +178,16 @@ function UserCard({ member, canManage, isSelf, onRoleChange, onRemove, onOpenPro
         </div>
       )}
 
-      <div className="flex flex-col items-center text-center">
-        <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-base font-medium mb-2 ring-2 ring-white shadow-md"
-          style={{ backgroundColor: color?.hex ?? '#C8A96E' }}>
+      <div className="flex flex-col items-center text-center" style={{ position: 'relative', zIndex: 1 }}>
+        <div
+          className="w-12 h-12 rounded-full flex items-center justify-center text-white text-base font-medium mb-2 ring-2 shadow-md"
+          style={{
+            backgroundColor: hex,
+            boxShadow: dark
+              ? `0 0 0 2px ${hex}60, 0 0 16px ${hex}70`
+              : `0 0 0 2px #fff, 0 2px 8px rgba(0,0,0,0.15)`,
+          }}
+        >
           {u?.firstName?.[0]}{u?.lastName?.[0]}
         </div>
 

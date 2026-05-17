@@ -27,12 +27,8 @@ function getPageGlow(pathname: string): string {
             radial-gradient(ellipse at 8% 88%, rgba(200,119,59,0.08) 0%, transparent 42%)`;
   if (pathname.startsWith('/trackers'))
     return '';
-  if (pathname.startsWith('/users'))
-    return `radial-gradient(ellipse at 12% 8%, rgba(78,127,196,0.15) 0%, transparent 50%),
-            radial-gradient(ellipse at 82% 88%, rgba(0,191,255,0.07) 0%, transparent 42%)`;
-  if (pathname.startsWith('/materials'))
-    return `radial-gradient(ellipse at 84% 88%, rgba(126,200,227,0.13) 0%, transparent 50%),
-            radial-gradient(ellipse at 14% 12%, rgba(115,201,71,0.07) 0%, transparent 44%)`;
+  if (pathname.startsWith('/users')) return '';
+  if (pathname.startsWith('/materials')) return '';
   if (pathname.startsWith('/spaces'))
     return `radial-gradient(ellipse at 50% 4%, rgba(155,89,182,0.14) 0%, transparent 50%),
             radial-gradient(ellipse at 86% 90%, rgba(194,24,91,0.08) 0%, transparent 42%)`;

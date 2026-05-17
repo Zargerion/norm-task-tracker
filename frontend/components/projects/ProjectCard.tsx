@@ -92,13 +92,40 @@ export function ProjectCard({ project, role, spaceId, onView, onEdit, onDelete }
       onMouseLeave={() => setHovered(false)}
       onClick={() => onView(project)}
     >
-    <div className="genshin-card overflow-hidden group">
-      {/* Color strip */}
-      {color && (
-        <div className="h-1 w-full" style={{ backgroundColor: color.hex }} />
+    <div
+      className="genshin-card overflow-hidden group"
+      style={dark && color ? {
+        borderColor: hovered ? `${color.hex}55` : `${color.hex}28`,
+        boxShadow: hovered
+          ? `0 0 0 1px ${color.hex}45, 0 8px 32px ${color.hex}25, 0 2px 8px rgba(0,0,0,0.5)`
+          : `0 0 0 1px ${color.hex}20, 0 4px 20px ${color.hex}12, 0 2px 8px rgba(0,0,0,0.4)`,
+        transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
+      } : undefined}
+    >
+      {/* Ambient glow inside card in dark mode */}
+      {dark && color && (
+        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+          <div style={{
+            position: 'absolute',
+            top: '-10px', left: '-10px',
+            width: '160px', height: '160px',
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${color.hex}14 0%, transparent 70%)`,
+            opacity: hovered ? 1 : 0.6,
+            transition: 'opacity 0.3s ease',
+          }} />
+        </div>
       )}
 
-      <div className="p-5">
+      {/* Color strip */}
+      {color && (
+        <div className="h-1 w-full relative" style={{
+          backgroundColor: color.hex,
+          boxShadow: dark ? `0 0 8px ${color.hex}99` : undefined,
+        }} />
+      )}
+
+      <div className="p-5" style={{ position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <div className="flex items-start gap-3 mb-4">
           {project.imageUrl ? (
@@ -107,7 +134,10 @@ export function ProjectCard({ project, role, spaceId, onView, onEdit, onDelete }
             </div>
           ) : (
             <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-white text-lg font-medium"
-              style={{ backgroundColor: color?.hex ?? '#C8A96E' }}>
+              style={{
+                backgroundColor: color?.hex ?? '#C8A96E',
+                boxShadow: dark ? `0 0 14px ${color?.hex ?? '#C8A96E'}80` : undefined,
+              }}>
               {project.name[0]}
             </div>
           )}
