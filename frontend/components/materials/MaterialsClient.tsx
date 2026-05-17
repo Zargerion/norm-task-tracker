@@ -57,7 +57,8 @@ export function MaterialsClient({ user }: Props) {
           {materials.map((m) => (
             <button key={m.id}
               onClick={() => { setSelected(m); setCreating(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-xl transition-colors ${selected?.id === m.id ? 'bg-amber-50 border border-amber-200' : 'hover:bg-black/5'}`}>
+              className={`w-full text-left px-3 py-2.5 rounded-xl transition-colors ${selected?.id === m.id ? 'border' : 'hover:bg-black/5 border border-transparent'}`}
+              style={selected?.id === m.id ? { background: 'rgba(212,160,64,0.12)', borderColor: 'rgba(212,160,64,0.35)' } : undefined}>
               <div className="flex items-center gap-2 mb-0.5">
                 {m.isPublic ? <Globe size={11} className="text-green-500 flex-shrink-0" />
                   : m.isSpaceWide ? <Users size={11} className="text-blue-400 flex-shrink-0" />

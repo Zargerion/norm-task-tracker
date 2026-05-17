@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getColor } from '@/lib/colors';
 import { api } from '@/lib/api';
+import { useTheme } from '@/hooks/useTheme';
 
 const TOOLTIP_W = 360;
 const TOOLTIP_H = 420;
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export function ProjectCard({ project, role, spaceId, onView, onEdit, onDelete }: Props) {
+  const { dark } = useTheme();
   const [hovered, setHovered] = useState(false);
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
@@ -154,21 +156,39 @@ export function ProjectCard({ project, role, spaceId, onView, onEdit, onDelete }
                 <span className="text-muted text-xs">завершено</span>
               )}
             </div>
-            <div className="relative h-1.5 bg-black/8 rounded-full overflow-visible">
+            <div className="timeline-track relative h-1.5 rounded-full overflow-visible">
+              {/* Бегущий свет по всему треку в тёмной теме */}
+              {dark && (
+                <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: `linear-gradient(90deg, transparent 15%, ${color?.hex ?? '#C8A96E'}55 50%, transparent 85%)`,
+                    animation: 'timelineShimmer 7s ease-in-out infinite',
+                  }} />
+                </div>
+              )}
               {/* Прогресс */}
-              <div className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
-                style={{ width: `${progressPct}%`, backgroundColor: color?.hex ?? '#C8A96E' }} />
+              <div
+                className="timeline-bar absolute inset-y-0 left-0 rounded-full transition-all duration-500"
+                style={{
+                  width: `${progressPct}%`,
+                  backgroundColor: color?.hex ?? '#C8A96E',
+                  boxShadow: dark ? `0 0 8px ${color?.hex ?? '#C8A96E'}cc, 0 0 16px ${color?.hex ?? '#C8A96E'}55` : undefined,
+                }}
+              />
               {/* Точки вех */}
               {milestones.map((ms: any) => {
                 const pct = msPct(ms);
                 const isPast = new Date(ms.date) <= now;
                 return (
                   <div key={ms.id}
-                    className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white"
+                    className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2"
                     style={{
                       left: `calc(${pct}% - 6px)`,
-                      backgroundColor: isPast ? (color?.hex ?? '#C8A96E') : '#D1C9B8',
-                      zIndex: 1,
+                      backgroundColor: isPast ? (color?.hex ?? '#C8A96E') : (dark ? '#3a3830' : '#D1C9B8'),
+                      borderColor: dark ? (isPast ? color?.hex ?? '#C8A96E' : '#4a4840') : '#fff',
+                      boxShadow: dark && isPast ? `0 0 8px ${color?.hex ?? '#C8A96E'}bb` : undefined,
+                      zIndex: 2,
                     }}
                     title={`${ms.title} — ${new Date(ms.date).toLocaleDateString('ru')}`}
                   />

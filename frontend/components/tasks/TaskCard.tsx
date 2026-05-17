@@ -34,6 +34,7 @@ export function TaskCard({ task, role, spaceId, projectId, onClick, onEdit, onSt
   const tier = complexityTier(task.estimatedHours);
   const isRelic = tier === 5;
   const isEpic = tier === 4;
+  const isUnique = tier === 3;
   const statusIdx = STATUS_STEPS.indexOf(task.status);
   const canManage = ['SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(role);
 
@@ -61,7 +62,7 @@ export function TaskCard({ task, role, spaceId, projectId, onClick, onEdit, onSt
     onStatusChange(updated);
   }
 
-  const shimmerClass = isRelic ? 'relic-shimmer task-glow-relic' : isEpic ? 'epic-shimmer task-glow-epic' : '';
+  const shimmerClass = isRelic ? 'relic-shimmer task-glow-relic' : isEpic ? 'epic-shimmer task-glow-epic' : isUnique ? 'epic-shimmer' : '';
 
   // Top strip gradient
   const topStrip = isRelic
@@ -88,8 +89,8 @@ export function TaskCard({ task, role, spaceId, projectId, onClick, onEdit, onSt
       {/* Top complexity strip */}
       <div className="h-[3px] w-full flex-shrink-0" style={{ background: topStrip }} />
 
-      {/* Ambient tint for epic/relic */}
-      {tier >= 4 && (
+      {/* Ambient tint for unique/epic/relic */}
+      {tier >= 3 && (
         <div
           className="absolute inset-0 pointer-events-none"
           style={{

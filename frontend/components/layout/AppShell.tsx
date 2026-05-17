@@ -9,14 +9,34 @@ import { useAuthStore } from '@/lib/auth-store';
 import { api } from '@/lib/api';
 import { getColor } from '@/lib/colors';
 import { ProfileModal } from '@/components/profile/ProfileModal';
+import { useTheme } from '@/hooks/useTheme';
 import {
   FolderOpen, Users, Kanban, BookOpen, Globe2,
   LogOut, ChevronDown, Menu, X, Building2, UserCog,
+  Sun, Moon,
 } from 'lucide-react';
 
 interface Props {
   user: any;
   children: React.ReactNode;
+}
+
+function getPageGlow(pathname: string): string {
+  if (pathname.startsWith('/projects'))
+    return `radial-gradient(ellipse at 88% 6%, rgba(212,160,64,0.14) 0%, transparent 52%),
+            radial-gradient(ellipse at 8% 88%, rgba(200,119,59,0.08) 0%, transparent 42%)`;
+  if (pathname.startsWith('/trackers'))
+    return '';
+  if (pathname.startsWith('/users'))
+    return `radial-gradient(ellipse at 12% 8%, rgba(78,127,196,0.15) 0%, transparent 50%),
+            radial-gradient(ellipse at 82% 88%, rgba(0,191,255,0.07) 0%, transparent 42%)`;
+  if (pathname.startsWith('/materials'))
+    return `radial-gradient(ellipse at 84% 88%, rgba(126,200,227,0.13) 0%, transparent 50%),
+            radial-gradient(ellipse at 14% 12%, rgba(115,201,71,0.07) 0%, transparent 44%)`;
+  if (pathname.startsWith('/spaces'))
+    return `radial-gradient(ellipse at 50% 4%, rgba(155,89,182,0.14) 0%, transparent 50%),
+            radial-gradient(ellipse at 86% 90%, rgba(194,24,91,0.08) 0%, transparent 42%)`;
+  return '';
 }
 
 const NAV_ITEMS = [
@@ -30,6 +50,7 @@ export function AppShell({ user, children }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const { setUser, currentRole, currentSpaceId, setSpace, spaces, setSpaces } = useAuthStore();
+  const { dark, toggle: toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [spaceMenuOpen, setSpaceMenuOpen] = useState(false);
@@ -168,6 +189,45 @@ export function AppShell({ user, children }: Props) {
           })}
         </nav>
 
+        {/* Theme toggle */}
+        <div className="px-3 pb-1">
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-colors text-left group"
+            title={dark ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'}
+          >
+            <span className="text-muted group-hover:text-secondary transition-colors">
+              {dark ? <Moon size={15} /> : <Sun size={15} />}
+            </span>
+            <span className="flex-1 text-sm text-secondary">
+              {dark ? 'Тёмная тема' : 'Светлая тема'}
+            </span>
+            {/* Тумблер */}
+            <div
+              className="relative flex-shrink-0 w-9 h-[22px] rounded-full transition-colors"
+              style={{
+                background: dark
+                  ? 'rgba(212,160,64,0.55)'
+                  : 'rgba(180,164,140,0.45)',
+                boxShadow: dark
+                  ? '0 0 10px rgba(212,160,64,0.45), inset 0 1px 2px rgba(0,0,0,0.3)'
+                  : 'inset 0 1px 2px rgba(0,0,0,0.15)',
+              }}
+            >
+              <div
+                className="absolute top-[3px] w-4 h-4 rounded-full shadow-sm transition-transform"
+                style={{
+                  transform: dark ? 'translateX(19px)' : 'translateX(3px)',
+                  background: dark ? '#E8B84B' : '#fff',
+                  boxShadow: dark
+                    ? '0 0 6px rgba(232,184,75,0.8)'
+                    : '0 1px 3px rgba(0,0,0,0.2)',
+                }}
+              />
+            </div>
+          </button>
+        </div>
+
         {/* User block */}
         <div className="p-3 border-t border-card" ref={userMenuRef}>
           <button
@@ -220,7 +280,10 @@ export function AppShell({ user, children }: Props) {
           <LogoTooltip size="sm" />
         </header>
 
-        <main className="flex-1 overflow-y-auto">
+        <main
+          className="flex-1 overflow-y-auto"
+          style={dark ? { backgroundImage: getPageGlow(pathname) } : undefined}
+        >
           {children}
         </main>
       </div>

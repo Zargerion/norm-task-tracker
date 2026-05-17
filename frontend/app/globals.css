@@ -18,6 +18,22 @@
     --shadow-hover: 0 4px 20px rgba(44,36,22,0.14);
   }
 
+  /* Dark theme — как будто выключили свет и включились тёплые ночники */
+  .dark {
+    --bg-base: #111113;
+    --bg-panel: #18181C;
+    --bg-sidebar: #0D0D10;
+    --text-primary: #EEE8D9;
+    --text-secondary: #8A8478;
+    --text-muted: #4C4844;
+    --accent-gold: #D4A040;
+    --accent-gold-light: #E8B84B;
+    --border-soft: rgba(212,160,64,0.11);
+    --border-card: rgba(212,160,64,0.18);
+    --shadow-card: 0 2px 16px rgba(0,0,0,0.55);
+    --shadow-hover: 0 4px 28px rgba(0,0,0,0.75), 0 0 24px rgba(212,160,64,0.14);
+  }
+
   * { box-sizing: border-box; }
 
   html, body {
@@ -148,6 +164,34 @@
     50%       { box-shadow: 0 0 16px rgba(149,111,212,0.4), 0 0 32px rgba(149,111,212,0.12); }
   }
 
+  /* Timeline shimmer */
+  @keyframes timelineShimmer {
+    0%   { transform: translateX(-180%); opacity: 0; }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { transform: translateX(180%); opacity: 0; }
+  }
+
+  .timeline-track {
+    background: rgba(0,0,0,0.08);
+  }
+  .dark .timeline-track {
+    background: rgba(255,255,255,0.07);
+  }
+
+  .timeline-bar {
+    position: relative;
+    overflow: hidden;
+  }
+  .dark .timeline-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 15%, rgba(255,255,255,0.45) 50%, transparent 85%);
+    animation: timelineShimmer 2.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+
   .fade-in-up {
     animation: fadeInUp 0.3s ease-out;
   }
@@ -186,6 +230,72 @@
     background: rgba(253,250,244,0.85);
     border: 1px solid rgba(200,169,110,0.3);
   }
+
+  /* === DARK MODE OVERRIDES === */
+
+  /* Glow on page headings */
+  .dark h1 {
+    text-shadow: 0 0 40px rgba(212,160,64,0.25), 0 0 80px rgba(212,160,64,0.1);
+  }
+  .dark h2 {
+    text-shadow: 0 0 28px rgba(212,160,64,0.18);
+  }
+
+  /* Active sidebar link glows */
+  .dark .sidebar-link.active {
+    box-shadow: inset 3px 0 0 var(--accent-gold), 0 0 12px rgba(212,160,64,0.1);
+  }
+
+  /* Gold accent glow on focus/active buttons */
+  .dark button:focus-visible {
+    outline: 1px solid rgba(212,160,64,0.5);
+    box-shadow: 0 0 0 3px rgba(212,160,64,0.12);
+  }
+
+  .dark .genshin-card:hover {
+    box-shadow: 0 4px 28px rgba(0,0,0,0.7), 0 0 28px rgba(212,160,64,0.16), 0 0 0 1px rgba(212,160,64,0.22);
+    border-color: rgba(212,160,64,0.32);
+  }
+
+  .dark .kanban-column {
+    background: linear-gradient(180deg, rgba(24,24,28,0.85) 0%, rgba(17,17,19,0.65) 100%);
+  }
+
+  .dark .glass {
+    background: rgba(22,22,26,0.92);
+    border-color: rgba(212,160,64,0.18);
+  }
+
+  .dark .sidebar-link:hover {
+    background: rgba(212,160,64,0.08);
+    color: var(--text-primary);
+  }
+  .dark .sidebar-link.active {
+    background: rgba(212,160,64,0.15);
+    color: var(--text-primary);
+  }
+
+  /* Fix hover:bg-black/5 buttons in dark mode */
+  .dark .hover\:bg-black\/5:hover {
+    background-color: rgba(255,255,255,0.04);
+  }
+
+  /* Pulsing glows stay vibrant in dark */
+  .dark .task-glow-relic {
+    animation: pulseGlowRelicDark 2.5s ease-in-out infinite;
+  }
+  @keyframes pulseGlowRelicDark {
+    0%, 100% { box-shadow: 0 0 10px rgba(194,24,91,0.35), var(--shadow-card); }
+    50%       { box-shadow: 0 0 28px rgba(194,24,91,0.6), 0 0 50px rgba(194,24,91,0.22); }
+  }
+
+  .dark .task-glow-epic {
+    animation: pulseGlowEpicDark 3s ease-in-out infinite;
+  }
+  @keyframes pulseGlowEpicDark {
+    0%, 100% { box-shadow: 0 0 8px rgba(149,111,212,0.3), var(--shadow-card); }
+    50%       { box-shadow: 0 0 22px rgba(149,111,212,0.55), 0 0 44px rgba(149,111,212,0.18); }
+  }
 }
 
 /* Markdown prose overrides */
@@ -197,6 +307,15 @@
   --tw-prose-code: #956FD4;
   --tw-prose-pre-bg: rgba(44,36,22,0.05);
   max-width: none;
+}
+
+.dark .prose {
+  --tw-prose-body: var(--text-primary);
+  --tw-prose-headings: var(--text-primary);
+  --tw-prose-links: #E8B84B;
+  --tw-prose-bold: var(--text-primary);
+  --tw-prose-code: #B08FE8;
+  --tw-prose-pre-bg: rgba(212,160,64,0.06);
 }
 
 /* Custom scrollbar */
