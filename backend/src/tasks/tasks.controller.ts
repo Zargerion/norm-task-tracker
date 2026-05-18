@@ -4,7 +4,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto, UpdateTaskStatusDto, AddAssigneeDto, AddAdditionDto } from './dto/task.dto';
+import { CreateTaskDto, UpdateTaskStatusDto, AddAssigneeDto, AddAdditionDto, ReorderTasksDto } from './dto/task.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -40,6 +40,14 @@ export class TasksController {
     @CurrentUser() user: any,
   ) {
     return this.tasks.create(spaceId, projectId, dto, user.sub);
+  }
+
+  @Patch('reorder')
+  reorder(
+    @Param('projectId') projectId: string,
+    @Body() dto: ReorderTasksDto,
+  ) {
+    return this.tasks.reorder(projectId, dto);
   }
 
   @Patch(':id')

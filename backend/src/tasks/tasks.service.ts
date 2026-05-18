@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateTaskDto, AddAssigneeDto, AddAdditionDto } from './dto/task.dto';
+import { CreateTaskDto, AddAssigneeDto, AddAdditionDto, ReorderTasksDto } from './dto/task.dto';
 import { TelegramService } from '../bot/telegram.service';
 import { ConfigService } from '@nestjs/config';
 import { TasksGateway } from './tasks.gateway';
@@ -37,7 +37,7 @@ export class TasksService {
     return this.prisma.task.findMany({
       where: { spaceId, projectId },
       include: TASK_INCLUDE,
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ position: 'asc' }, { createdAt: 'desc' }],
     });
   }
 
@@ -251,6 +251,15 @@ export class TasksService {
 
   async addAddition(taskId: string, userId: string, dto: AddAdditionDto) {
     return this.prisma.taskAddition.create({ data: { taskId, userId, content: dto.content } });
+  }
+
+  async reorder(projectId: string, dto: ReorderTasksDto) {
+    await this.prisma.$transaction(
+      dto.updates.map(({ id, position }) =>
+        this.prisma.task.update({ where: { id }, data: { position } }),
+      ),
+    );
+    return { ok: true };
   }
 
   async getTotalTime(taskId: string): Promise<number> {
