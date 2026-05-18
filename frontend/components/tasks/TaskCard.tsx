@@ -33,7 +33,7 @@ export function TaskCard({ task, role, spaceId, projectId, onClick, onEdit, onSt
   const complexity = getTaskComplexity(task.estimatedHours);
   const tier = complexityTier(task.estimatedHours);
   const isRelic = tier === 5;
-  const isEpic = tier === 4;
+  const isLegendary = tier === 4;
   const isUnique = tier === 3;
   const statusIdx = STATUS_STEPS.indexOf(task.status);
   const canManage = ['SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(role);
@@ -62,13 +62,13 @@ export function TaskCard({ task, role, spaceId, projectId, onClick, onEdit, onSt
     onStatusChange(updated);
   }
 
-  const shimmerClass = isRelic ? 'relic-shimmer task-glow-relic' : isEpic ? 'epic-shimmer task-glow-epic' : isUnique ? 'epic-shimmer' : '';
+  const shimmerClass = isRelic ? 'relic-shimmer task-glow-relic' : isLegendary ? 'legendary-shimmer task-glow-legendary' : isUnique ? 'epic-shimmer' : '';
 
   // Top strip gradient
   const topStrip = isRelic
     ? `linear-gradient(90deg, #C2185B 0%, #956FD4 35%, #C8773B 65%, #C2185B 100%)`
-    : isEpic
-    ? `linear-gradient(90deg, #956FD4, #B08FE8 50%, #956FD4)`
+    : isLegendary
+    ? `linear-gradient(90deg, #C8773B 0%, #FFB13C 40%, #E8920A 60%, #C8773B 100%)`
     : complexity.hex;
 
   return (

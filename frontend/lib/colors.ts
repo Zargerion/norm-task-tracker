@@ -27,6 +27,6 @@ export function getTaskComplexity(hours: number | null | undefined) {
   if (hours <= 3)  return { hex: '#9DADA8', label: 'Обычная',    glow: '' };
   if (hours <= 5)  return { hex: '#4E7FC4', label: 'Нормальная', glow: '0 0 8px rgba(78,127,196,0.4)' };
   if (hours <= 8)  return { hex: '#956FD4', label: 'Уникальная', glow: '0 0 10px rgba(149,111,212,0.5)' };
-  if (hours <= 20) return { hex: '#B08FE8', label: 'Особая',     glow: '0 0 12px rgba(176,143,232,0.6)' };
+  if (hours <= 20) return { hex: '#E8920A', label: 'Легендарная', glow: '0 0 12px rgba(232,146,10,0.6)' };
   return { hex: '#C2185B', label: 'Реликварная', glow: '0 0 16px rgba(194,24,91,0.7)', relic: true };
 }

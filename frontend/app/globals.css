@@ -147,6 +147,41 @@
     100% { transform: translateX(80%);  opacity: 0; }
   }
 
+  /* Legendary shimmer (orange/gold) */
+  .legendary-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .legendary-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 20%,
+      rgba(232,146,10,0.13) 38%,
+      rgba(255,180,50,0.18) 50%,
+      rgba(232,146,10,0.13) 62%,
+      transparent 80%
+    );
+    animation: legendaryShimmer 3.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes legendaryShimmer {
+    0%   { transform: translateX(-80%); opacity: 0; }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { transform: translateX(80%);  opacity: 0; }
+  }
+
+  .task-glow-legendary {
+    animation: pulseGlowLegendary 2.8s ease-in-out infinite;
+  }
+  @keyframes pulseGlowLegendary {
+    0%, 100% { box-shadow: 0 0 7px rgba(232,146,10,0.3), var(--shadow-card); }
+    50%       { box-shadow: 0 0 20px rgba(232,146,10,0.55), 0 0 40px rgba(232,146,10,0.18); }
+  }
+
   /* Pulsing glow for task borders */
   .task-glow-relic {
     animation: pulseGlowRelic 2.5s ease-in-out infinite;
@@ -295,6 +330,14 @@
   @keyframes pulseGlowEpicDark {
     0%, 100% { box-shadow: 0 0 8px rgba(149,111,212,0.3), var(--shadow-card); }
     50%       { box-shadow: 0 0 22px rgba(149,111,212,0.55), 0 0 44px rgba(149,111,212,0.18); }
+  }
+
+  .dark .task-glow-legendary {
+    animation: pulseGlowLegendaryDark 2.8s ease-in-out infinite;
+  }
+  @keyframes pulseGlowLegendaryDark {
+    0%, 100% { box-shadow: 0 0 10px rgba(232,146,10,0.4), var(--shadow-card); }
+    50%       { box-shadow: 0 0 28px rgba(232,146,10,0.7), 0 0 52px rgba(232,146,10,0.22); }
   }
 }
 
