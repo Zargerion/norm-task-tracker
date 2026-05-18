@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, MessageSquare, Edit2 } from 'lucide-react';
+import { Clock, MessageSquare, Edit2, UserCheck } from 'lucide-react';
 import { getTaskComplexity, getColor } from '@/lib/colors';
 import { api } from '@/lib/api';
 
@@ -138,7 +138,7 @@ export function TaskCard({ task, role, spaceId, projectId, onClick, onEdit, onSt
                     key={s}
                     className="flex-1 text-center transition-colors"
                     style={{
-                      fontSize: '9px',
+                      fontSize: '11px',
                       color: i === statusIdx ? complexity.hex : 'var(--text-muted)',
                       fontWeight: i === statusIdx ? 600 : 400,
                     }}
@@ -202,7 +202,8 @@ export function TaskCard({ task, role, spaceId, projectId, onClick, onEdit, onSt
           <div className="flex items-center gap-2 min-w-0">
             {/* Assignees */}
             {task.assignees?.length > 0 && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1" title="Исполнители">
+                <UserCheck size={11} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
                 <div className="flex -space-x-1.5">
                   {task.assignees.slice(0, 4).map((a: any) => {
                     const c = getColor(a.user?.favoriteColor);
@@ -210,7 +211,7 @@ export function TaskCard({ task, role, spaceId, projectId, onClick, onEdit, onSt
                       <div
                         key={a.id}
                         className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-white"
-                        style={{ backgroundColor: c?.hex ?? '#C8A96E', fontSize: '9px', fontWeight: 600 }}
+                        style={{ backgroundColor: c?.hex ?? '#C8A96E', fontSize: '10px', fontWeight: 600 }}
                         title={`${a.user?.firstName} ${a.user?.lastName}`}
                       >
                         {a.user?.firstName?.[0]}
@@ -286,7 +287,7 @@ export function TaskCard({ task, role, spaceId, projectId, onClick, onEdit, onSt
               return (
                 <div
                   className="w-4 h-4 rounded-full border border-white flex items-center justify-center text-white flex-shrink-0"
-                  style={{ backgroundColor: c?.hex ?? '#C8A96E', fontSize: '8px' }}
+                  style={{ backgroundColor: c?.hex ?? '#C8A96E', fontSize: '10px' }}
                 >
                   {task.createdBy?.firstName?.[0]}
                 </div>

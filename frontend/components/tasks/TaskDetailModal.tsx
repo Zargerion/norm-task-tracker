@@ -164,7 +164,7 @@ export function TaskDetailModal({ task, spaceId, projectId, user, role, onClose,
                   <span
                     className="text-center transition-colors"
                     style={{
-                      fontSize: '9px',
+                      fontSize: '11px',
                       color: i === statusIdx ? complexity.hex : 'var(--text-muted)',
                       fontWeight: i === statusIdx ? 600 : 400,
                     }}
@@ -260,7 +260,7 @@ export function TaskDetailModal({ task, spaceId, projectId, user, role, onClose,
                           <div key={a.id} className="flex items-center gap-2">
                             <div
                               className="w-6 h-6 rounded-full flex items-center justify-center text-white flex-shrink-0"
-                              style={{ backgroundColor: c?.hex ?? '#C8A96E', fontSize: '10px', fontWeight: 600 }}
+                              style={{ backgroundColor: c?.hex ?? '#C8A96E', fontSize: '11px', fontWeight: 600 }}
                             >
                               {a.user?.firstName?.[0]}
                             </div>
@@ -283,7 +283,7 @@ export function TaskDetailModal({ task, spaceId, projectId, user, role, onClose,
                         return (
                           <div
                             className="w-6 h-6 rounded-full flex items-center justify-center text-white flex-shrink-0"
-                            style={{ backgroundColor: c?.hex ?? '#C8A96E', fontSize: '10px', fontWeight: 600 }}
+                            style={{ backgroundColor: c?.hex ?? '#C8A96E', fontSize: '11px', fontWeight: 600 }}
                           >
                             {task.createdBy?.firstName?.[0]}
                           </div>

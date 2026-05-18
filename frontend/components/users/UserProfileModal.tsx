@@ -307,7 +307,7 @@ export function UserProfileModal({ member, spaceId, onClose }: Props) {
                                                     <div
                                                       key={a.id}
                                                       className="w-4 h-4 rounded-full border border-white flex items-center justify-center text-white"
-                                                      style={{ backgroundColor: ac?.hex ?? '#C8A96E', fontSize: '8px' }}
+                                                      style={{ backgroundColor: ac?.hex ?? '#C8A96E', fontSize: '10px' }}
                                                       title={`${a.user?.firstName} ${a.user?.lastName}`}
                                                     >
                                                       {a.user?.firstName?.[0]}
